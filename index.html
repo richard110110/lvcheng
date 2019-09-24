@@ -16,8 +16,14 @@
  
         <p id="demo"></p>
 
-        <p id="temperature"></p>
+       <div id="container">
+
+       </div>
+
+
         <button onclick="myFunction()">Try it</button>
+
+        <button id="convert"> convert</button>
 
     <script>
         var latitute = "-35.28";
@@ -38,19 +44,144 @@
 
         var key = "14115acc07a71a15d6f9b300e9af88d1";
 
-        var url = `https://api.darksky.net/forecast/${key}/${latitute},${longtitute},${unix}`;
+        var url = `https://api.darksky.net/forecast/${key}/${latitute},${longtitute},${unix}?callback=?&units=si`;
+        
+        var result  = $.getJSON(url);
+
+        console.log(result);
 
         // var data = $.getJSON(url);
-        $.getJSON(url, function (data) {
-          //data is the JSON string
-          console.log(data);
+        // $.getJSON(url, function (data) {
+        //   //data is the JSON string
+        //   console.log(data);
           
-        });
+        // });
+
+        var column = [];
+
+        $.getJSON(url, function(data){
+            console.log(data.hourly.data);
+            console.log(data.hourly.data[0]);
+            console.log(data.hourly.data.length);
+
+            var noOfContacts = data.hourly.data.length;
+
+            if(noOfContacts>0){
+
+            var table = document.createElement("table");
+			table.style.width = '50%';
+			table.setAttribute('border', '1');
+			table.setAttribute('cellspacing', '0');
+            table.setAttribute('cellpadding', '5');
+            
+			
+			// retrieve column header ('Name', 'Email', and 'Mobile')
+ 
+			var col = []; // define an empty array
+			for (var i = 0; i < noOfContacts; i++) {
+				for (var key in data.hourly.data[i]) {
+					if (col.indexOf(key) === -1) {
+						col.push(key);
+					}
+				}
+            }
+
+            // CREATE TABLE HEAD .
+			var tHead = document.createElement("thead");	
+				
+			
+                // CREATE ROW FOR TABLE HEAD .
+                var hRow = document.createElement("tr");
+                
+                // ADD COLUMN HEADER TO ROW OF TABLE HEAD.
+                for (var i = 0; i < col.length; i++) {
+                        var th = document.createElement("th");
+                        th.innerHTML = col[i];
+                        hRow.appendChild(th);
+                }
+                tHead.appendChild(hRow);
+                table.appendChild(tHead);
+                
+                // CREATE TABLE BODY .
+                var tBody = document.createElement("tbody");	
+                for (var i = 0; i < noOfContacts; i++) {
+			
+            var bRow = document.createElement("tr"); // CREATE ROW FOR EACH RECORD .
+            
+            
+            for (var j = 0; j < col.length; j++) {
+                var td = document.createElement("td");
+                td.innerHTML = data.hourly.data[i][col[j]];
+                bRow.appendChild(td);
+            }
+            tBody.appendChild(bRow)
+
+    }
+            table.appendChild(tBody);	
+			
+			
+			// FINALLY ADD THE NEWLY CREATED TABLE WITH JSON DATA TO A CONTAINER.
+			var divContainer = document.getElementById("container");
+			divContainer.innerHTML = "";
+			divContainer.appendChild(table);
+
+        }
+
+            
+        })
 
         console.log(url);
 
 
 }
+
+function download_csv(csv, filename) {
+    var csvFile;
+    var downloadLink;
+
+    // CSV FILE
+    csvFile = new Blob([csv], {type: "text/csv"});
+
+    // Download link
+    downloadLink = document.createElement("a");
+
+    // File name
+    downloadLink.download = filename;
+
+    // We have to create a link to the file
+    downloadLink.href = window.URL.createObjectURL(csvFile);
+
+    // Make sure that the link is not displayed
+    downloadLink.style.display = "none";
+
+    // Add the link to your DOM
+    document.body.appendChild(downloadLink);
+
+    // Lanzamos
+    downloadLink.click();
+}
+
+function export_table_to_csv(html, filename) {
+	var csv = [];
+	var rows = document.querySelectorAll("table tr");
+	
+    for (var i = 0; i < rows.length; i++) {
+		var row = [], cols = rows[i].querySelectorAll("td, th");
+		
+        for (var j = 0; j < cols.length; j++) 
+            row.push(cols[j].innerText);
+        
+		csv.push(row.join(","));		
+	}
+
+    // Download CSV
+    download_csv(csv.join("\n"), filename);
+}
+
+document.querySelector("#convert").addEventListener("click", function () {
+    var html = document.querySelector("#container").outerHTML;
+	export_table_to_csv(html, "table.csv");
+});
         
     </script>
 </body>
