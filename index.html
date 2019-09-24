@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+
+    <title>dark sky</title>
+</head>
+<body>
+
+        <input type="datetime-local" id="time" name="trip-start"
+        value="2018-07-22"
+        min="2018-01-01" max="2019-12-31">
+ 
+        <p id="demo"></p>
+
+        <p id="temperature"></p>
+        <button onclick="myFunction()">Try it</button>
+
+    <script>
+        var latitute = "-35.28";
+        var longtitute = "149.13"; 
+        
+        function myFunction() {
+        var x = document.getElementById("time").value;
+        document.getElementById("demo").innerHTML = x;
+
+        
+        var unix = Math.round(new Date(x).getTime()/1000);
+
+        
+
+        
+
+        console.log(unix);
+
+        var key = "14115acc07a71a15d6f9b300e9af88d1";
+
+        var url = `https://api.darksky.net/forecast/${key}/${latitute},${longtitute},${unix}`;
+
+        // var data = $.getJSON(url);
+        $.getJSON(url, function (data) {
+          //data is the JSON string
+          console.log(data);
+          
+        });
+
+        console.log(url);
+
+
+}
+        
+    </script>
+</body>
+</html>
